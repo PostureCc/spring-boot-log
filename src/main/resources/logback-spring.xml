@@ -4,11 +4,13 @@
     <contextName>system-log</contextName>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
+    <property name="LOG_HOME" value="logs/"/>
+
     <!-- 控制台 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- 日志格式 -->
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger Line:%-3L - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger :%-3L - %msg%n</pattern>
             <charset>utf-8</charset>
         </encoder>
         <!--此日志appender是为开发使用，只配置最底级别，控制台输出的日志级别是大于或等于此级别的日志信息-->
@@ -17,50 +19,47 @@
         </filter>
     </appender>
 
-    <!-- 普通日志 -->
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>log/spring-boot-log-info.log</file>
-        <!-- 循环政策：基于时间创建日志文件 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 日志命名:单个文件大于128MB 按照时间+自增i 生成log文件 -->
-            <fileNamePattern>log/spring-boot-log-info-%d{yyyy-MM-dd HH}.%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>50MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <!-- 最大保存时间：30天-->
-            <maxHistory>30</maxHistory>
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}-info.log</FileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>180</MaxHistory>
         </rollingPolicy>
-        <append>true</append>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger Line:%-3L - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger :%-3L - %msg%n</pattern>
             <charset>utf-8</charset>
         </encoder>
+        <!--日志文件最大的大小-->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+        <!-- 日志级别过滤器 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>info</level>
+            <!-- 过滤的级别 -->
+            <level>INFO</level>
+            <!-- 匹配时的操作：接收（记录） -->
             <onMatch>ACCEPT</onMatch>
+            <!-- 不匹配时的操作：拒绝（不记录） -->
             <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
 
-    <!-- 错误日志 -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>log/spring-boot-log-error.log</file>
-        <!-- 循环政策：基于时间创建日志文件 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 日志命名:单个文件大于20MB 按照时间+自增i 生成log文件 -->
-            <fileNamePattern>log/spring-boot-log-error-%d{yyyy-MM-dd HH}.%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>20MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <!-- 最大保存时间：180天-->
-            <maxHistory>180</maxHistory>
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}-error.log</FileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>180</MaxHistory>
         </rollingPolicy>
-        <append>true</append>
-        <!-- 日志格式 -->
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger Line:%-3L - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger Line:%-3L - %msg%n</pattern>
             <charset>utf-8</charset>
         </encoder>
+        <!--日志文件最大的大小-->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
         <!-- 日志级别过滤器 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <!-- 过滤的级别 -->
@@ -72,14 +71,20 @@
         </filter>
     </appender>
 
+
+    <logger name="com.apache.ibatis" level="TRACE"/>
+    <logger name="java.sql.Connection" level="DEBUG"/>
+    <logger name="java.sql.Statement" level="DEBUG"/>
+    <logger name="java.sql.PreparedStatement" level="DEBUG"/>
+
     <!-- additivity 避免执行2次 -->
-    <logger name="com.itstyle" level="INFO" additivity="false">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="INFO_FILE"/>
-        <appender-ref ref="ERROR_FILE"/>
-    </logger>
+    <!--<logger name="mapper" level="INFO" additivity="false">-->
+    <!--<appender-ref ref="STDOUT"/>-->
+    <!--<appender-ref ref="INFO_FILE"/>-->
+    <!--<appender-ref ref="ERROR_FILE"/>-->
+    <!--</logger>-->
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <!--<appender-ref ref="STDOUT"/>-->
         <appender-ref ref="INFO_FILE"/>
         <appender-ref ref="ERROR_FILE"/>
     </root>

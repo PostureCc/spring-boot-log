@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chan.dao.StudentDao">
+
+    <select id="queryInfo" resultType="Map">
+		  select * from student
+	</select>
+
+    <select id="search" parameterType="java.util.Map" resultType="Map">
+        SELECT * FROM STUDENT
+        WHERE 1 = 1
+        <if test="id != null and id != 0">
+            AND ID = #{id}
+        </if>
+        <if test="name != null and name != ''">
+            AND NAME = #{name}
+        </if>
+        <if test="telephone != null and telephone != ''">
+            AND TELEPHONE = #{telephone}
+        </if>
+        <if test="email != null and email != ''">
+            AND EMAIL = #{email}
+        </if>
+        <if test="classId != null and classId != ''">
+            AND CLASSID = #{classId}
+        </if>
+    </select>
+
+</mapper>
